@@ -218,3 +218,36 @@
     box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.4);
   }
 }
+
+/* Clerk Modal Customization */
+.cl-modalBackdrop {
+  backdrop-filter: blur(12px) !important;
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.cl-modal {
+  max-width: 650px !important;
+  width: 95% !important;
+}
+
+.cl-card {
+  min-height: 600px !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.cl-rootBox {
+  width: 100% !important;
+}
+
+.cl-internal-b3fm6y {
+  min-height: 600px !important;
+}
+
+.cl-modalContent {
+  border-radius: 1rem !important;
+}
+
+.cl-cardBox {
+  border-radius: 1rem !important;
+}

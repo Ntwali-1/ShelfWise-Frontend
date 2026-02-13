@@ -43,7 +43,23 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ClerkProvider>
+        <ClerkProvider
+          appearance={{
+            elements: {
+              modalBackdrop: 'backdrop-blur-xl bg-black/60',
+              card: 'shadow-2xl',
+              rootBox: 'w-full',
+              modalContent: 'rounded-2xl',
+              cardBox: 'rounded-2xl',
+            },
+            variables: {
+              colorPrimary: '#8B5CF6',
+              colorBackground: '#ffffff',
+              colorText: '#1e293b',
+              borderRadius: '1rem',
+            },
+          }}
+        >
           <ThemeProvider>
             <LayoutClient>{children}</LayoutClient>
             <Toaster position="top-right" />

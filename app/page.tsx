@@ -27,6 +27,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import Typed from 'typed.js'
 import LandingNavbar from '@/components/LandingNavbar'
+import ClientOnly from '@/components/ClientOnly'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -78,7 +79,9 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen">
-      <LandingNavbar />
+      <ClientOnly>
+        <LandingNavbar />
+      </ClientOnly>
 
       {/* Hero Section */}
       <section

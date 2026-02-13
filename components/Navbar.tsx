@@ -6,6 +6,7 @@ import { ShoppingCart, Heart, Search, Menu, Package } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import ThemeToggle from './ThemeToggle'
+import ClientOnly from './ClientOnly'
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -59,7 +60,9 @@ export default function Navbar() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
-            <ThemeToggle />
+            <ClientOnly>
+              <ThemeToggle />
+            </ClientOnly>
             <Link
               href="/wishlist"
               className="relative rounded-lg p-2 transition-colors hover:bg-accent"

@@ -3,9 +3,22 @@
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from './ThemeProvider'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <div className="h-10 w-10 rounded-full bg-primary/10 p-2" />
+    )
+  }
 
   return (
     <motion.button

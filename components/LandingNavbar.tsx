@@ -6,6 +6,7 @@ import { Package, Menu, X } from 'lucide-react'
 import { SignInButton } from '@clerk/nextjs'
 import { cn } from '@/lib/utils'
 import ThemeToggle from './ThemeToggle'
+import ClientOnly from './ClientOnly'
 
 const navItems = [
   { name: 'Home', href: '#hero' },
@@ -99,7 +100,9 @@ export default function LandingNavbar() {
 
             {/* Right Actions */}
             <div className="hidden md:flex items-center gap-3">
-              <ThemeToggle />
+              <ClientOnly>
+                <ThemeToggle />
+              </ClientOnly>
               <SignInButton mode="modal">
                 <motion.button
                   className="px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
@@ -113,7 +116,9 @@ export default function LandingNavbar() {
 
             {/* Mobile Menu Button */}
             <div className="flex items-center gap-3 md:hidden">
-              <ThemeToggle />
+              <ClientOnly>
+                <ThemeToggle />
+              </ClientOnly>
               <motion.button
                 onClick={() => setIsMenuOpen((prev) => !prev)}
                 className="text-foreground z-50"

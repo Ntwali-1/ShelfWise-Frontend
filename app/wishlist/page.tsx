@@ -1,38 +1,113 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Heart, ShoppingCart, Trash2, Star } from 'lucide-react'
+import { wishlistApi, cartApi } from '@/lib/api'
+import { useAuth } from '@clerk/nextjs'
+import toast from 'react-hot-toast'
 
-// Mock wishlist data
-const mockWishlistItems = [
-  {
-    id: '1',
-    productId: '3',
-    name: 'Premium Leather Bag',
-    price: 159.99,
-    rating: 4.6,
-    reviews: 89,
-    image: '/placeholder-product.jpg',
-    inStock: true,
-  },
-  {
-    id: '2',
-    productId: '4',
-    name: 'Ergonomic Office Chair',
-    price: 449.99,
-    rating: 4.7,
-    reviews: 167,
-    image: '/placeholder-product.jpg',
-    inStock: false,
-  },
-]
+interface WishlistItem {
+  id: number
+  productId: string
+  product: {
+    id: string
+    name: string
+    price: number
+    imageUrl: string | null
+    quantity: number
+    Review?: { rating: number }[]
+  }
+}
 
 export default function WishlistPage() {
-  const [wishlistItems, setWishlistItems] = useState(mockWishlistItems)
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const removeItem = (id: string) => {
-    setWishlistItems((items) => items.filter((item) => item.id !== id))
+  const fetchWishlist = async () => {
+    try {
+      const token = await getToken()
+      if (!token) return
+
+      const data = await wishlistApi.getAll(token) as WishlistItem[]
+      setWishlistItems(data)
+    } catch (error) {
+      console.error('Failed to fetch wishlist:', error)
+      toast.error('Failed to load wishlist')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      fetchWishlist()
+    } else if (isLoaded && !isSignedIn) {
+      setLoading(false)
+    }
+  }, [isLoaded, isSignedIn])
+
+  const removeItem = async (productId: string) => {
+    try {
+      const token = await getToken()
+      if (!token) return
+
+      await wishlistApi.remove(productId, token)
+      toast.success('Removed from wishlist')
+      setWishlistItems((items) => items.filter((item) => item.productId !== productId))
+    } catch (error) {
+      console.error('Failed to remove item:', error)
+      toast.error('Failed to remove item')
+    }
+  }
+
+  const addToCart = async (productId: string) => {
+    try {
+      const token = await getToken()
+      if (!token) {
+        toast.error('Please sign in')
+        return
+      }
+
+      await cartApi.addItem(productId, 1, token)
+      toast.success('Added to cart')
+    } catch (error) {
+      console.error('Failed to add to cart:', error)
+      toast.error('Failed to add to cart')
+    }
+  }
+
+  // Calculate rating helper
+  const getRating = (reviews: { rating: number }[] | undefined) => {
+    if (!reviews || reviews.length === 0) return { rating: 0, count: 0 }
+    const total = reviews.reduce((acc, r) => acc + r.rating, 0)
+    return { rating: (total / reviews.length).toFixed(1), count: reviews.length }
+  }
+
+  if (!isLoaded || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="mb-4 text-2xl font-bold">Please sign in</h1>
+          <p className="mb-8 text-muted-foreground">You need to be signed in to view your wishlist</p>
+          <Link
+            href="/sign-in"
+            className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 font-medium text-primary-foreground transition-all hover:bg-primary/90"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   if (wishlistItems.length === 0) {
@@ -67,67 +142,74 @@ export default function WishlistPage() {
             <h1 className="mb-2 text-3xl font-bold">My Wishlist</h1>
             <p className="text-muted-foreground">{wishlistItems.length} items saved</p>
           </div>
-          <button
-            onClick={() => setWishlistItems([])}
-            className="text-sm text-destructive transition-colors hover:text-destructive/80"
-          >
-            Clear All
-          </button>
+          {/* Clear All - Optional, need API for it or loop delete */}
+          {/* <button className="...">Clear All</button> */}
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {wishlistItems.map((item) => (
-            <div
-              key={item.id}
-              className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg"
-            >
-              <Link href={`/products/${item.productId}`}>
-                <div className="relative aspect-square overflow-hidden bg-muted">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  {!item.inStock && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                      <span className="rounded-lg bg-destructive px-3 py-1 text-sm font-medium text-destructive-foreground">
-                        Out of Stock
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </Link>
+          {wishlistItems.map((item) => {
+            const { rating, count } = getRating(item.product.Review)
+            const inStock = item.product.quantity > 0
 
-              <button
-                onClick={() => removeItem(item.id)}
-                className="absolute right-2 top-2 rounded-lg bg-background/80 p-2 text-destructive backdrop-blur-sm transition-colors hover:bg-background"
+            return (
+              <div
+                key={item.id}
+                className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg"
               >
-                <Trash2 className="h-4 w-4" />
-              </button>
-
-              <div className="p-4">
                 <Link href={`/products/${item.productId}`}>
-                  <h3 className="mb-2 font-semibold transition-colors group-hover:text-primary">
-                    {item.name}
-                  </h3>
+                  <div className="relative aspect-square overflow-hidden bg-muted">
+                    {item.product.imageUrl ? (
+                      <img src={item.product.imageUrl} alt={item.product.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+                    )}
+
+                    {!inStock && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <span className="rounded-lg bg-destructive px-3 py-1 text-sm font-medium text-destructive-foreground">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </Link>
 
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium">{item.rating}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">({item.reviews})</span>
-                </div>
-
-                <div className="mb-4 text-xl font-bold">${item.price}</div>
-
                 <button
-                  disabled={!item.inStock}
-                  className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+                  onClick={() => removeItem(item.productId)}
+                  className="absolute right-2 top-2 rounded-lg bg-background/80 p-2 text-destructive backdrop-blur-sm transition-colors hover:bg-background"
                 >
-                  <ShoppingCart className="h-4 w-4" />
-                  Add to Cart
+                  <Trash2 className="h-4 w-4" />
                 </button>
+
+                <div className="p-4">
+                  <Link href={`/products/${item.productId}`}>
+                    <h3 className="mb-2 font-semibold transition-colors group-hover:text-primary line-clamp-1">
+                      {item.product.name}
+                    </h3>
+                  </Link>
+
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Star className={`h-3 w-3 ${count > 0 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                      <span className="text-sm font-medium">{rating || 'New'}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">({count})</span>
+                  </div>
+
+                  <div className="mb-4 text-xl font-bold">${item.product.price.toFixed(2)}</div>
+
+                  <button
+                    onClick={() => addToCart(item.productId)}
+                    disabled={!inStock}
+                    className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Add to Cart
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>

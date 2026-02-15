@@ -1,39 +1,27 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Package, ChevronRight, Clock, Truck, CheckCircle, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ordersApi } from '@/lib/api'
+import { useAuth } from '@clerk/nextjs'
+import toast from 'react-hot-toast'
 
-// Mock orders data
-const mockOrders = [
-  {
-    id: 'ORD-001',
-    date: '2026-02-10',
-    status: 'delivered',
-    total: 699.98,
-    items: 2,
-    products: [
-      { name: 'Wireless Headphones Pro', quantity: 1 },
-      { name: 'Smart Watch Series 5', quantity: 1 },
-    ],
-  },
-  {
-    id: 'ORD-002',
-    date: '2026-02-12',
-    status: 'shipped',
-    total: 159.99,
-    items: 1,
-    products: [{ name: 'Premium Leather Bag', quantity: 1 }],
-  },
-  {
-    id: 'ORD-003',
-    date: '2026-02-13',
-    status: 'processing',
-    total: 449.99,
-    items: 1,
-    products: [{ name: 'Ergonomic Office Chair', quantity: 1 }],
-  },
-]
+interface Order {
+  id: string
+  status: string
+  totalPrice: number
+  createdAt: string
+  OrderItem: {
+    id: number
+    quantity: number
+    price: number
+    product: {
+      name: string
+    }
+  }[]
+}
 
 const statusConfig = {
   pending: {
@@ -69,7 +57,59 @@ const statusConfig = {
 }
 
 export default function OrdersPage() {
-  if (mockOrders.length === 0) {
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = await getToken()
+        if (!token) return
+
+        const data = await ordersApi.getAll(token) as Order[]
+        setOrders(data)
+      } catch (error) {
+        console.error('Failed to fetch orders:', error)
+        toast.error('Failed to load orders')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (isLoaded && isSignedIn) {
+      fetchOrders()
+    } else if (isLoaded && !isSignedIn) {
+      setLoading(false)
+    }
+  }, [isLoaded, isSignedIn, getToken])
+
+  if (!isLoaded || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="mb-4 text-2xl font-bold">Please sign in</h1>
+          <p className="mb-8 text-muted-foreground">You need to be signed in to view your orders</p>
+          <Link
+            href="/sign-in"
+            className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 font-medium text-primary-foreground transition-all hover:bg-primary/90"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (orders.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
@@ -99,9 +139,11 @@ export default function OrdersPage() {
         <h1 className="mb-8 text-3xl font-bold">My Orders</h1>
 
         <div className="space-y-4">
-          {mockOrders.map((order) => {
-            const status = statusConfig[order.status as keyof typeof statusConfig]
+          {orders.map((order) => {
+            const statusKey = order.status as keyof typeof statusConfig
+            const status = statusConfig[statusKey] || statusConfig.pending // Fallback
             const StatusIcon = status.icon
+            const itemCount = order.OrderItem.reduce((acc, item) => acc + item.quantity, 0)
 
             return (
               <Link
@@ -126,7 +168,7 @@ export default function OrdersPage() {
                     </div>
 
                     <div className="mb-2 text-sm text-muted-foreground">
-                      Ordered on {new Date(order.date).toLocaleDateString('en-US', {
+                      Ordered on {new Date(order.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -134,14 +176,16 @@ export default function OrdersPage() {
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                      {order.items} {order.items === 1 ? 'item' : 'items'} • ${order.total.toFixed(2)}
+                      {itemCount} {itemCount === 1 ? 'item' : 'items'} • ${order.totalPrice.toFixed(2)}
                     </div>
 
                     <div className="mt-2 text-sm">
-                      {order.products.map((product, index) => (
+                      {order.OrderItem.map((item, index) => (
                         <span key={index}>
-                          {product.name}
-                          {index < order.products.length - 1 && ', '}
+                          {item.product.name}
+                          {/* Add quantity if > 1? */}
+                          {item.quantity > 1 ? ` (x${item.quantity})` : ''}
+                          {index < order.OrderItem.length - 1 && ', '}
                         </span>
                       ))}
                     </div>

@@ -1,60 +1,90 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, SlidersHorizontal, Grid3x3, List, Heart, ShoppingCart, Star } from 'lucide-react'
+import { Search, Grid3x3, List, Heart, ShoppingCart, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { productsApi, categoriesApi } from '@/lib/api'
+import { useAuth } from '@clerk/nextjs'
+import toast from 'react-hot-toast'
 
-// Mock data - will be replaced with API calls
-const mockProducts = [
-  {
-    id: '1',
-    name: 'Wireless Headphones Pro',
-    price: 299.99,
-    rating: 4.5,
-    reviews: 128,
-    image: '/placeholder-product.jpg',
-    category: 'Electronics',
-    inStock: true,
-  },
-  {
-    id: '2',
-    name: 'Smart Watch Series 5',
-    price: 399.99,
-    rating: 4.8,
-    reviews: 256,
-    image: '/placeholder-product.jpg',
-    category: 'Electronics',
-    inStock: true,
-  },
-  {
-    id: '3',
-    name: 'Premium Leather Bag',
-    price: 159.99,
-    rating: 4.6,
-    reviews: 89,
-    image: '/placeholder-product.jpg',
-    category: 'Fashion',
-    inStock: true,
-  },
-  {
-    id: '4',
-    name: 'Ergonomic Office Chair',
-    price: 449.99,
-    rating: 4.7,
-    reviews: 167,
-    image: '/placeholder-product.jpg',
-    category: 'Home & Living',
-    inStock: false,
-  },
-]
+interface Product {
+  id: string
+  name: string
+  price: number
+  quantity: number
+  description?: string
+  imageUrl?: string
+  category: {
+    id: number
+    name: string
+  }
+}
+
+interface Category {
+  id: number
+  name: string
+  _count?: {
+    Product: number
+  }
+}
 
 export default function ProductsPage() {
+  const { getToken } = useAuth()
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
 
-  const categories = ['all', 'Electronics', 'Fashion', 'Home & Living']
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categoriesApi.getAll()
+        setCategories(data)
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  // Fetch products
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true)
+      try {
+        const params: any = {
+          page,
+          limit: 12,
+        }
+        
+        if (searchQuery) {
+          params.search = searchQuery
+        }
+        
+        if (selectedCategory !== 'all') {
+          params.category = selectedCategory
+        }
+
+        const data = await productsApi.getAll(params)
+        setProducts(data.products || data)
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to fetch products')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const debounce = setTimeout(() => {
+      fetchProducts()
+    }, 300)
+
+    return () => clearTimeout(debounce)
+  }, [searchQuery, selectedCategory, page])
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,19 +110,31 @@ export default function ProductsPage() {
           </div>
 
           {/* Category Filter */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={cn(
+                'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                selectedCategory === 'all'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              )}
+            >
+              All
+            </button>
             {categories.map((category) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={category.id}
+                onClick={() => setSelectedCategory(category.name)}
                 className={cn(
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-                  selectedCategory === category
+                  selectedCategory === category.name
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 )}
               >
-                {category === 'all' ? 'All' : category}
+                {category.name}
+                {category._count && ` (${category._count.Product})`}
               </button>
             ))}
           </div>
@@ -120,17 +162,33 @@ export default function ProductsPage() {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && products.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No products found</p>
+          </div>
+        )}
+
         {/* Products Grid */}
-        <div
-          className={cn(
-            'grid gap-6',
-            viewMode === 'grid' ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'
-          )}
-        >
-          {mockProducts.map((product) => (
-            <ProductCard key={product.id} product={product} viewMode={viewMode} />
-          ))}
-        </div>
+        {!loading && products.length > 0 && (
+          <div
+            className={cn(
+              'grid gap-6',
+              viewMode === 'grid' ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'
+            )}
+          >
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} viewMode={viewMode} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -140,14 +198,20 @@ function ProductCard({
   product,
   viewMode,
 }: {
-  product: (typeof mockProducts)[0]
+  product: Product
   viewMode: 'grid' | 'list'
 }) {
+  const inStock = product.quantity > 0
+
   if (viewMode === 'list') {
     return (
       <div className="group flex gap-6 rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg">
         <div className="relative h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+          {product.imageUrl ? (
+            <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+          )}
         </div>
         <div className="flex flex-1 flex-col justify-between">
           <div>
@@ -158,23 +222,25 @@ function ProductCard({
                     {product.name}
                   </h3>
                 </Link>
-                <p className="text-sm text-muted-foreground">{product.category}</p>
+                <p className="text-sm text-muted-foreground">{product.category.name}</p>
               </div>
               <button className="rounded-lg p-2 transition-colors hover:bg-accent">
                 <Heart className="h-5 w-5" />
               </button>
             </div>
-            <div className="mb-2 flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm font-medium">{product.rating}</span>
-              </div>
-              <span className="text-sm text-muted-foreground">({product.reviews} reviews)</span>
-            </div>
+            {product.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{product.description}</p>
+            )}
           </div>
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold">${product.price}</div>
-            <button className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90">
+            <div>
+              <div className="text-2xl font-bold">${product.price.toFixed(2)}</div>
+              <p className="text-xs text-muted-foreground">{inStock ? `${product.quantity} in stock` : 'Out of stock'}</p>
+            </div>
+            <button 
+              disabled={!inStock}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <ShoppingCart className="h-4 w-4" />
               Add to Cart
             </button>
@@ -188,8 +254,12 @@ function ProductCard({
     <div className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg">
       <Link href={`/products/${product.id}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-          {!product.inStock && (
+          {product.imageUrl ? (
+            <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+          )}
+          {!inStock && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/80">
               <span className="rounded-lg bg-destructive px-3 py-1 text-sm font-medium text-destructive-foreground">
                 Out of Stock
@@ -201,25 +271,19 @@ function ProductCard({
       <div className="p-4">
         <div className="mb-2 flex items-start justify-between">
           <Link href={`/products/${product.id}`}>
-            <h3 className="font-semibold transition-colors group-hover:text-primary">{product.name}</h3>
+            <h3 className="font-semibold transition-colors group-hover:text-primary line-clamp-1">{product.name}</h3>
           </Link>
           <button className="rounded-lg p-1 transition-colors hover:bg-accent">
             <Heart className="h-4 w-4" />
           </button>
         </div>
-        <p className="mb-2 text-sm text-muted-foreground">{product.category}</p>
-        <div className="mb-3 flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">{product.rating}</span>
-          </div>
-          <span className="text-xs text-muted-foreground">({product.reviews})</span>
-        </div>
+        <p className="mb-2 text-sm text-muted-foreground">{product.category.name}</p>
+        <p className="mb-3 text-xs text-muted-foreground">{inStock ? `${product.quantity} in stock` : 'Out of stock'}</p>
         <div className="flex items-center justify-between">
-          <div className="text-xl font-bold">${product.price}</div>
+          <div className="text-xl font-bold">${product.price.toFixed(2)}</div>
           <button
-            disabled={!product.inStock}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+            disabled={!inStock}
+            className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-4 w-4" />
           </button>

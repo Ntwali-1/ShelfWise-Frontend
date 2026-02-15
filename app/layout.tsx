@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import LayoutClient from '@/components/LayoutClient'
+import RoleCheck from '@/components/RoleCheck'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/ThemeProvider'
 
@@ -61,7 +62,9 @@ export default function RootLayout({
           }}
         >
           <ThemeProvider>
-            <LayoutClient>{children}</LayoutClient>
+            <RoleCheck>
+              <LayoutClient>{children}</LayoutClient>
+            </RoleCheck>
             <Toaster position="top-right" />
           </ThemeProvider>
         </ClerkProvider>

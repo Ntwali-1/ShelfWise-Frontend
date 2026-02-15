@@ -2,7 +2,11 @@
 export interface User {
   id: number
   email: string
-  role: 'client' | 'admin'
+  role?: 'client' | 'admin' | null
+  clerkId?: string
+  createdAt?: string
+  updatedAt?: string
+  Profile?: Profile
 }
 
 export interface Profile {

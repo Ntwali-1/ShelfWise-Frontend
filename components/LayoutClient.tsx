@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@clerk/nextjs'
-import Navbar from '@/components/Navbar'
+import FloatingNavbar from '@/components/FloatingNavbar'
 import Footer from '@/components/Footer'
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
@@ -9,7 +9,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   return (
     <div className="flex min-h-screen flex-col">
-      {isSignedIn && <Navbar />}
+      {isSignedIn && <FloatingNavbar />}
       <main className="flex-1">{children}</main>
       {isSignedIn && <Footer />}
     </div>

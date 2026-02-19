@@ -522,120 +522,452 @@ function LandingPage() {
 }
 
 function HomePage() {
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCategories(data)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-purple-50/20 to-primary/10 dark:from-primary/10 dark:via-purple-900/10 dark:to-primary/10">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-purple-50/30 to-indigo-50/20 dark:from-primary/5 dark:via-purple-900/10 dark:to-indigo-900/10">
         <motion.div
-          className="container mx-auto px-4 py-16 sm:px-6 lg:px-8"
+          className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex flex-col items-center justify-between gap-8 lg:flex-row">
-            <div className="max-w-xl">
-              <h1 className="mb-4 text-4xl font-bold sm:text-5xl">
-                Discover Your Next <span className="text-primary text-glow">Favorite Product</span>
-              </h1>
-              <p className="mb-6 text-lg text-muted-foreground">
-                Explore our curated collection of premium products at unbeatable prices
-              </p>
-              <Link href="/products" className="cosmic-button inline-flex items-center gap-2">
-                Browse Products
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+          <div className="flex flex-col items-center justify-between gap-12 lg:flex-row">
+            <div className="max-w-2xl">
+              <motion.div
+                className="mb-6"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
+                  <Sparkles className="h-4 w-4" />
+                  Welcome Back to ShelfWise
+                </span>
+              </motion.div>
+              <motion.h1
+                className="mb-6 text-5xl font-bold sm:text-6xl lg:text-7xl leading-tight"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Discover Your Next{' '}
+                <span className="text-primary text-glow block mt-2">Favorite Product</span>
+              </motion.h1>
+              <motion.p
+                className="mb-8 text-xl text-muted-foreground leading-relaxed"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                Explore our curated collection of premium products across all categories. Quality
+                meets affordability.
+              </motion.p>
+              <motion.div
+                className="flex flex-wrap gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Link href="/products" className="cosmic-button inline-flex items-center gap-2">
+                  <ShoppingBag className="h-5 w-5" />
+                  Browse All Products
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/categories"
+                  className="px-6 py-3 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 hover:scale-105 font-medium inline-flex items-center gap-2"
+                >
+                  <Package className="h-5 w-5" />
+                  View Categories
+                </Link>
+              </motion.div>
+
+              {/* Quick Action Cards */}
+              <motion.div
+                className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <Link
+                  href="/cart"
+                  className="group p-4 rounded-xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                >
+                  <ShoppingBag className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                  <div className="text-sm font-medium">My Cart</div>
+                </Link>
+                <Link
+                  href="/wishlist"
+                  className="group p-4 rounded-xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                >
+                  <Heart className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                  <div className="text-sm font-medium">Wishlist</div>
+                </Link>
+                <Link
+                  href="/orders"
+                  className="group p-4 rounded-xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                >
+                  <Package className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                  <div className="text-sm font-medium">Orders</div>
+                </Link>
+                <Link
+                  href="/profile"
+                  className="group p-4 rounded-xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                >
+                  <Users className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                  <div className="text-sm font-medium">Profile</div>
+                </Link>
+              </motion.div>
             </div>
+
+            {/* Hero Image Grid */}
             <motion.div
-              className="relative h-64 w-full max-w-md lg:h-80"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 300 }}
+              className="relative w-full max-w-lg"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
             >
-              <div className="h-full w-full rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 overflow-hidden shadow-2xl">
-                <img
-                  src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop"
-                  alt="Shopping"
-                  className="w-full h-full object-cover"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <motion.div
+                  className="relative h-56 rounded-2xl overflow-hidden shadow-xl"
+                  whileHover={{ scale: 1.05, rotate: -2 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop"
+                    alt="Electronics"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <div className="text-lg font-bold">Electronics</div>
+                    <div className="text-sm opacity-90">Latest Tech</div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="relative h-56 rounded-2xl overflow-hidden shadow-xl mt-8"
+                  whileHover={{ scale: 1.05, rotate: 2 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop"
+                    alt="Fashion"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <div className="text-lg font-bold">Fashion</div>
+                    <div className="text-sm opacity-90">Trending Styles</div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="relative h-56 rounded-2xl overflow-hidden shadow-xl -mt-8"
+                  whileHover={{ scale: 1.05, rotate: 2 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&h=400&fit=crop"
+                    alt="Home"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <div className="text-lg font-bold">Home</div>
+                    <div className="text-sm opacity-90">Cozy Living</div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="relative h-56 rounded-2xl overflow-hidden shadow-xl"
+                  whileHover={{ scale: 1.05, rotate: -2 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=400&fit=crop"
+                    alt="Sports"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <div className="text-lg font-bold">Sports</div>
+                    <div className="text-sm opacity-90">Stay Active</div>
+                  </div>
+                </motion.div>
               </div>
+
+              {/* Floating Badge */}
+              <motion.div
+                className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-gradient-to-br from-primary to-purple-600 shadow-2xl shadow-primary/50 flex flex-col items-center justify-center border-4 border-background"
+                animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+              >
+                <TrendingUp className="w-10 h-10 text-white mb-1" />
+                <span className="text-xs font-bold text-white">HOT</span>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>
       </section>
 
       {/* Quick Stats */}
-      <section className="border-b border-border py-12">
+      <section className="py-12 bg-gradient-to-r from-primary/5 to-purple-50/20 dark:from-primary/5 dark:to-purple-900/10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             <motion.div
-              className="text-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              className="group text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-xl transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+              whileHover={{ y: -5 }}
             >
+              <div className="mb-3 inline-flex rounded-full bg-primary/10 p-4 text-primary group-hover:scale-110 transition-transform">
+                <Package className="h-6 w-6" />
+              </div>
               <div className="mb-1 text-3xl font-bold text-primary">10K+</div>
-              <div className="text-sm text-muted-foreground">Products</div>
+              <div className="text-sm text-muted-foreground font-medium">Products Available</div>
             </motion.div>
+
             <motion.div
-              className="text-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              className="group text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-xl transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ y: -5 }}
             >
+              <div className="mb-3 inline-flex rounded-full bg-primary/10 p-4 text-primary group-hover:scale-110 transition-transform">
+                <Users className="h-6 w-6" />
+              </div>
               <div className="mb-1 text-3xl font-bold text-primary">50K+</div>
-              <div className="text-sm text-muted-foreground">Happy Customers</div>
+              <div className="text-sm text-muted-foreground font-medium">Happy Customers</div>
             </motion.div>
+
             <motion.div
-              className="text-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              className="group text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-xl transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ y: -5 }}
             >
+              <div className="mb-3 inline-flex rounded-full bg-primary/10 p-4 text-primary group-hover:scale-110 transition-transform">
+                <Star className="h-6 w-6" />
+              </div>
               <div className="mb-1 text-3xl font-bold text-primary">4.9</div>
-              <div className="text-sm text-muted-foreground">Average Rating</div>
+              <div className="text-sm text-muted-foreground font-medium">Average Rating</div>
             </motion.div>
+
             <motion.div
-              className="text-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              className="group text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-xl transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ delay: 0.3 }}
+              whileHover={{ y: -5 }}
             >
+              <div className="mb-3 inline-flex rounded-full bg-primary/10 p-4 text-primary group-hover:scale-110 transition-transform">
+                <Headphones className="h-6 w-6" />
+              </div>
               <div className="mb-1 text-3xl font-bold text-primary">24/7</div>
-              <div className="text-sm text-muted-foreground">Support</div>
+              <div className="text-sm text-muted-foreground font-medium">Customer Support</div>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* Featured Categories */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="mb-8 text-3xl font-bold">
-            Shop by <span className="text-primary">Category</span>
-          </h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <CategoryCard
-              name="Electronics"
-              count="2,500+ items"
-              image="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&h=400&fit=crop"
+          <motion.div
+            className="mb-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="mb-4 text-4xl md:text-5xl font-bold">
+              Shop by <span className="text-primary">Category</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Browse through our carefully curated categories and find exactly what you're looking for
+            </p>
+          </motion.div>
+
+          {loading ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-72 rounded-2xl bg-muted/50 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {categories.map((category: any, index: number) => (
+                <EnhancedCategoryCard
+                  key={category.id}
+                  category={category}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-gradient-to-br from-indigo-50/30 via-purple-50/20 to-primary/5 dark:from-indigo-900/10 dark:via-purple-900/10 dark:to-primary/5">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            className="mb-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="mb-4 text-4xl md:text-5xl font-bold">
+              Why Shop <span className="text-primary">With Us?</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Experience the best online shopping with our premium features
+            </p>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <FeatureBox
+              icon={<Shield className="h-8 w-8" />}
+              title="Secure Payments"
+              description="Shop safely with encrypted transactions"
+              delay={0}
             />
-            <CategoryCard
-              name="Fashion"
-              count="5,000+ items"
-              image="https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=400&fit=crop"
+            <FeatureBox
+              icon={<Truck className="h-8 w-8" />}
+              title="Fast Delivery"
+              description="Quick shipping with real-time tracking"
+              delay={0.1}
             />
-            <CategoryCard
-              name="Home & Living"
-              count="3,200+ items"
-              image="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=400&fit=crop"
+            <FeatureBox
+              icon={<Gift className="h-8 w-8" />}
+              title="Special Offers"
+              description="Exclusive deals and discounts daily"
+              delay={0.2}
+            />
+            <FeatureBox
+              icon={<Award className="h-8 w-8" />}
+              title="Quality Guaranteed"
+              description="Premium products from trusted brands"
+              delay={0.3}
             />
           </div>
         </div>
       </section>
     </div>
+  )
+}
+
+function EnhancedCategoryCard({ category, index }: { category: any; index: number }) {
+  const categoryImages: Record<string, string> = {
+    Electronics: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&h=400&fit=crop',
+    Fashion: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=400&fit=crop',
+    'Home & Living': 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=400&fit=crop',
+    Sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&h=400&fit=crop',
+    Books: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=600&h=400&fit=crop',
+    Toys: 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=600&h=400&fit=crop',
+    Beauty: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=400&fit=crop',
+    Groceries: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=400&fit=crop',
+  }
+
+  const image = categoryImages[category.name] || 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&h=400&fit=crop'
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
+    >
+      <Link
+        href={`/products?category=${category.name}`}
+        className="group block relative overflow-hidden rounded-2xl bg-card border-2 border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl"
+      >
+        <motion.div
+          className="relative h-64 overflow-hidden"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.4 }}
+        >
+          <img
+            src={image}
+            alt={category.name}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          
+          {/* Content Overlay */}
+          <div className="absolute inset-0 p-6 flex flex-col justify-end">
+            <motion.div
+              className="transform transition-transform duration-300 group-hover:-translate-y-2"
+            >
+              <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                {category.name}
+                <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </h3>
+              <p className="text-sm text-white/90 mb-3">{category.description || 'Explore amazing products'}</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium">
+                <Package className="h-4 w-4" />
+                <span>Browse Now</span>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Hover Glow Effect */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-primary/20 to-transparent" />
+        </motion.div>
+      </Link>
+    </motion.div>
+  )
+}
+
+function FeatureBox({
+  icon,
+  title,
+  description,
+  delay,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  delay: number
+}) {
+  return (
+    <motion.div
+      className="group p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-xl transition-all duration-300"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay, duration: 0.5 }}
+      whileHover={{ y: -8 }}
+    >
+      <div className="mb-4 inline-flex rounded-xl bg-primary/10 p-4 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 group-hover:scale-110">
+        {icon}
+      </div>
+      <h3 className="mb-2 text-xl font-bold">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+    </motion.div>
   )
 }
 
@@ -777,10 +1109,10 @@ function CategoryCard({ name, count, image }: { name: string; count: string; ima
   return (
     <Link
       href={`/products?category=${name.toLowerCase()}`}
-      className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-2xl"
+      className="group relative overflow-hidden rounded-2xl border-2 border-border/50 bg-card hover:border-primary/50 transition-all hover:shadow-2xl"
     >
       <motion.div
-        className="relative h-48 overflow-hidden"
+        className="relative h-64 overflow-hidden"
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.3 }}
       >
@@ -791,7 +1123,10 @@ function CategoryCard({ name, count, image }: { name: string; count: string; ima
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <h3 className="mb-2 text-2xl font-bold">{name}</h3>
+          <h3 className="mb-2 text-2xl font-bold flex items-center gap-2">
+            {name}
+            <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </h3>
           <p className="text-sm text-white/80">{count}</p>
         </div>
       </motion.div>

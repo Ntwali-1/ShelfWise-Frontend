@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth, useUser } from '@clerk/nextjs'
 import toast from 'react-hot-toast'
-import { productsApi, categoriesApi, usersApi } from '@/lib/api'
-import { ArrowLeft, Upload, Loader2, AlertCircle } from 'lucide-react'
+import { productsApi, categoriesApi, usersApi, uploadApi } from '@/lib/api'
+import { ArrowLeft, Upload, Loader2, AlertCircle, ImageIcon, X } from 'lucide-react'
 import Link from 'next/link'
 
 interface Category {
@@ -41,6 +41,9 @@ export default function AddProductPage() {
     sku: '',
     imageUrl: '',
   })
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     checkAdminRole()
@@ -98,6 +101,45 @@ export default function AddProductPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Use JPEG, PNG, WebP, or GIF.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB.')
+      return
+    }
+
+    setUploadingImage(true)
+    try {
+      const token = await getToken()
+      if (!token) {
+        toast.error('Please sign in')
+        return
+      }
+      const { url } = await uploadApi.uploadImage(file, token)
+      setFormData((prev) => ({ ...prev, imageUrl: url }))
+      setImageFile(file)
+      toast.success('Image uploaded to Cloudinary')
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to upload image')
+    } finally {
+      setUploadingImage(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const removeImage = () => {
+    setFormData((prev) => ({ ...prev, imageUrl: '' }))
+    setImageFile(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const validateForm = (): boolean => {
@@ -313,34 +355,70 @@ export default function AddProductPage() {
               </div>
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload (Cloudinary) */}
             <div>
-              <label htmlFor="imageUrl" className="block text-sm font-medium mb-2">
-                Image URL
+              <label className="block text-sm font-medium mb-2">
+                Product Image
               </label>
-              <div className="relative">
-                <input
-                  type="url"
-                  id="imageUrl"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-2.5 pl-10 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                />
-                <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              </div>
-              {formData.imageUrl && (
-                <div className="mt-3 rounded-lg border border-border p-2 bg-background">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+              {formData.imageUrl ? (
+                <div className="relative rounded-lg border border-border overflow-hidden bg-background">
                   <img
                     src={formData.imageUrl}
-                    alt="Preview"
-                    className="w-full h-48 object-cover rounded-lg"
-                    onError={(e) => {
-                      e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Invalid+Image+URL'
-                    }}
+                    alt="Product preview"
+                    className="w-full h-48 object-cover"
                   />
+                  <div className="absolute top-2 right-2 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="rounded-lg bg-background/90 backdrop-blur p-2 hover:bg-background transition-colors disabled:opacity-50"
+                    >
+                      {uploadingImage ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="rounded-lg bg-background/90 backdrop-blur p-2 hover:bg-destructive/20 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <p className="px-3 py-2 text-xs text-muted-foreground bg-background/80">
+                    Stored on Cloudinary • Click upload to replace
+                  </p>
                 </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingImage}
+                  className="w-full h-48 rounded-lg border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3 text-muted-foreground hover:text-foreground"
+                >
+                  {uploadingImage ? (
+                    <>
+                      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                      <span>Uploading to Cloudinary...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ImageIcon className="h-12 w-12" />
+                      <span className="font-medium">Click to upload image</span>
+                      <span className="text-xs">JPEG, PNG, WebP or GIF • Max 5MB</span>
+                    </>
+                  )}
+                </button>
               )}
             </div>
 

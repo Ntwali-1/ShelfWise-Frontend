@@ -5,6 +5,8 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { usersApi } from '@/lib/api';
 import type { User } from '@/lib/types';
+import { ShoppingBag, Settings, Check, Package, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function SelectRolePage() {
   const { getToken } = useAuth();
@@ -28,7 +30,6 @@ export default function SelectRolePage() {
         const userData = await usersApi.getCurrentUser(token) as User;
         
         if (userData?.role) {
-          // User already has a role, redirect appropriately
           if (userData.role === 'admin') {
             router.push('/admin');
           } else {
@@ -39,7 +40,6 @@ export default function SelectRolePage() {
         }
       } catch (err: any) {
         console.error('Error checking role:', err);
-        // If user doesn't exist yet, that's fine - they'll be created when selecting role
         setChecking(false);
       }
     };
@@ -66,7 +66,6 @@ export default function SelectRolePage() {
 
       await usersApi.selectRole(selectedRole, token);
       
-      // Redirect based on role
       if (selectedRole === 'admin') {
         router.push('/admin');
       } else {
@@ -81,112 +80,148 @@ export default function SelectRolePage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
+  const roles = [
+    {
+      id: 'client' as const,
+      title: 'Customer',
+      description: 'Browse our curated collection, add items to your cart, place orders, and build your wishlist. Perfect for shoppers who want a seamless buying experience.',
+      icon: ShoppingBag,
+      features: ['Browse & discover products', 'Add to cart & wishlist', 'Track orders', 'Manage your profile'],
+      gradient: 'from-primary/20 via-purple-500/10 to-background',
+      iconBg: 'bg-primary/10 text-primary',
+      borderColor: 'border-primary/50',
+    },
+    {
+      id: 'admin' as const,
+      title: 'Admin',
+      description: 'Manage your store with full control. Add products, organize categories, process orders, and view analytics to grow your business.',
+      icon: Settings,
+      features: ['Manage products & categories', 'Process orders', 'View analytics', 'Full store control'],
+      gradient: 'from-violet-500/20 via-purple-500/10 to-background',
+      iconBg: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+      borderColor: 'border-violet-500/50',
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Welcome to ShelfWise!
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Hi {user?.firstName || 'there'}! Please select your role to continue
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
-          </div>
-        )}
-
-        <div className="space-y-4 mb-8">
-          {/* Customer Role */}
-          <button
-            onClick={() => setSelectedRole('client')}
-            disabled={loading}
-            className={`w-full p-6 rounded-xl border-2 transition-all ${
-              selectedRole === 'client'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
-            } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          >
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1 text-left">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                  Customer
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Browse products, add to cart, place orders, and manage your wishlist
-                </p>
-              </div>
-              {selectedRole === 'client' && (
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </button>
-
-          {/* Admin Role */}
-          <button
-            onClick={() => setSelectedRole('admin')}
-            disabled={loading}
-            className={`w-full p-6 rounded-xl border-2 transition-all ${
-              selectedRole === 'admin'
-                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700'
-            } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          >
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1 text-left">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                  Admin
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Manage products, categories, orders, and view analytics
-                </p>
-              </div>
-              {selectedRole === 'admin' && (
-                <div className="flex-shrink-0">
-                  <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </button>
-        </div>
-
-        <button
-          onClick={handleRoleSelection}
-          disabled={!selectedRole || loading}
-          className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+    <div className="min-h-screen">
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-4xl"
         >
-          {loading ? 'Setting up...' : 'Continue'}
-        </button>
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Package className="h-8 w-8 text-primary" />
+              <span className="text-2xl font-bold">
+                <span className="text-foreground">Shelf</span>
+                <span className="text-primary">Wise</span>
+              </span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              Welcome, {user?.firstName || 'there'}!
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Choose how you&apos;d like to use ShelfWise
+            </p>
+          </div>
+
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl"
+            >
+              <p className="text-destructive text-sm text-center">{error}</p>
+            </motion.div>
+          )}
+
+          {/* Role Cards - Two Columns */}
+          <div className="grid md:grid-cols-2 gap-6 mb-10">
+            {roles.map((role) => {
+              const Icon = role.icon;
+              const isSelected = selectedRole === role.id;
+              
+              return (
+                <motion.button
+                  key={role.id}
+                  onClick={() => setSelectedRole(role.id)}
+                  disabled={loading}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: role.id === 'client' ? 0.1 : 0.2 }}
+                  className={`relative w-full text-left p-8 rounded-2xl border-2 transition-all duration-300 overflow-hidden group ${
+                    isSelected
+                      ? `${role.borderColor} bg-card shadow-xl shadow-primary/5`
+                      : 'border-border bg-card/50 hover:border-primary/30 hover:bg-card'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  {/* Subtle gradient overlay */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${role.gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
+                  
+                  <div className="relative">
+                    <div className={`inline-flex rounded-xl p-3 mb-6 ${role.iconBg} transition-colors`}>
+                      <Icon className="h-8 w-8" />
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-foreground mb-3">{role.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                      {role.description}
+                    </p>
+                    
+                    <ul className="space-y-2 mb-6">
+                      {role.features.map((feature, i) => (
+                        <li key={i} className="flex items-center gap-2 text-sm text-foreground/90">
+                          <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {isSelected && (
+                      <div className="absolute top-4 right-4">
+                        <div className="rounded-full bg-primary p-1.5">
+                          <Check className="h-4 w-4 text-primary-foreground" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Continue Button */}
+          <motion.button
+            onClick={handleRoleSelection}
+            disabled={!selectedRole || loading}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="w-full max-w-md mx-auto flex items-center justify-center gap-2 py-4 px-6 bg-primary text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg"
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                Setting up...
+              </>
+            ) : (
+              <>
+                Continue
+                <ArrowRight className="h-5 w-5" />
+              </>
+            )}
+          </motion.button>
+        </motion.div>
       </div>
     </div>
   );

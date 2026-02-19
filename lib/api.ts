@@ -189,6 +189,31 @@ export const categoriesApi = {
   }, token),
 }
 
+// Upload API (Cloudinary via backend)
+export const uploadApi = {
+  uploadImage: async (file: File, token: string): Promise<{ url: string }> => {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4500'
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await fetch(`${API_BASE_URL}/upload/image`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Don't set Content-Type - browser sets it with boundary for FormData
+      },
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Upload failed' }))
+      throw new Error(error.message || `Upload failed: ${response.status}`)
+    }
+
+    return response.json()
+  },
+}
+
 // Profile API
 export const profileApi = {
   get: (token: string) => apiRequest('/profile', {}, token),

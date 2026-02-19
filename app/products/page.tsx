@@ -70,8 +70,9 @@ export default function ProductsPage() {
           params.category = selectedCategory
         }
 
-        const data = await productsApi.getAll(params)
-        setProducts(data.products || data)
+        const response = await productsApi.getAll(params)
+        const productList = response.data ?? response.products ?? (Array.isArray(response) ? response : [])
+        setProducts(productList)
       } catch (error: any) {
         toast.error(error.message || 'Failed to fetch products')
       } finally {

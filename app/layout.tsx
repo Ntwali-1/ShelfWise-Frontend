@@ -6,6 +6,7 @@ import LayoutClient from '@/components/LayoutClient'
 import RoleCheck from '@/components/RoleCheck'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import BackgroundDecorations from '@/components/BackgroundDecorations'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -68,6 +69,7 @@ export default function RootLayout({
           }}
         >
           <ThemeProvider>
+            <BackgroundDecorations />
             <RoleCheck>
               <LayoutClient>{children}</LayoutClient>
             </RoleCheck>

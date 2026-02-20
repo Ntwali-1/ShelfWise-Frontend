@@ -351,6 +351,10 @@ function LandingPage() {
           <span className="text-sm text-muted-foreground mb-2">Scroll Down</span>
           <ArrowDown className="h-5 w-5 text-primary" />
         </motion.div>
+
+        {/* Bottom Gradient */}
+        <div className="absolute inset-0 bottom-10 top-160 blur-[80px] bg-primary/40 h-16 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
       </section>
 
       {/* Features Section */}

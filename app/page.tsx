@@ -619,9 +619,67 @@ function HomePage() {
   return (
     <div className="min-h-screen relative">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-purple-50/30 to-indigo-50/20 dark:from-primary/5 dark:via-purple-900/10 dark:to-indigo-900/10">
+      <section className="relative overflow-hidden bg-white dark:bg-background">
+        {/* Grid Background */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.02]"
+            style={{
+              backgroundImage: `linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)`,
+              backgroundSize: '40px 40px',
+            }}
+          ></div>
+
+          <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_50%,hsl(var(--primary)/0.08),transparent)]"></div>
+
+          <div
+            className="absolute inset-0 opacity-[0.02] dark:opacity-[0.01]"
+            style={{
+              backgroundImage: `linear-gradient(to right, hsl(var(--primary)) 2px, transparent 2px), linear-gradient(to bottom, hsl(var(--primary)) 2px, transparent 2px)`,
+              backgroundSize: '200px 200px',
+            }}
+          ></div>
+        </div>
+
+        {/* Floating SVG Frames */}
         <motion.div
-          className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
+          initial={{ y: 0 }}
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -left-10 top-1/3 w-[200px] h-[200px] rotate-20 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [10, -10, 10] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute left-6 top-2/3 w-[200px] h-[200px] rotate-0 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [-15, 15, -15] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -right-10 top-1/2 -translate-y-1/2 w-[200px] h-[200px] -rotate-4 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [12, -12, 12] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-10 top-2/3 w-[200px] h-[200px] rotate-30 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          className="container mx-auto px-4 py-20 sm:px-6 lg:px-8 relative z-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -639,15 +697,35 @@ function HomePage() {
                   Welcome Back to ShelfWise
                 </span>
               </motion.div>
-              <motion.h1
-                className="mb-6 text-5xl font-bold sm:text-6xl lg:text-7xl leading-tight"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                Discover Your Next{' '}
-                <span className="text-primary text-glow block mt-2">Favorite Product</span>
-              </motion.h1>
+
+              <div className="inline-block relative mb-6">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                  className="absolute -left-28 -top-6 hidden lg:block"
+                >
+                  <img src="/LeftArrow.png" width={50} height={50} alt="" />
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                  className="absolute -right-28 -top-6 hidden lg:block"
+                >
+                  <img src="/RightArrow.png" width={50} height={50} alt="" />
+                </motion.div>
+
+                <motion.h1
+                  className="text-5xl font-bold sm:text-6xl lg:text-7xl leading-tight"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  Discover Your Next{' '}
+                  <span className="text-primary text-glow block mt-2">Favorite Product</span>
+                </motion.h1>
+              </div>
               <motion.p
                 className="mb-8 text-xl text-muted-foreground leading-relaxed"
                 initial={{ opacity: 0, x: -20 }}
@@ -804,6 +882,10 @@ function HomePage() {
             </motion.div>
           </div>
         </motion.div>
+
+        {/* Bottom Gradient */}
+        <div className="absolute inset-0 bottom-10 top-160 blur-[80px] bg-primary/40 h-16 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
       </section>
 
       {/* Quick Stats */}

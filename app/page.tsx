@@ -114,36 +114,40 @@ function LandingPage() {
           initial={{ y: 0 }}
           animate={{ y: [-10, 10, -10] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -left-10 top-2/5 -translate-y-1/3 w-[200px] h-[200px] rotate-20 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute -left-10 top-2/5 -translate-y-1/3 w-[250px] h-[250px] rotate-20 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: [10, -10, 10] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-6 top-3/5 -translate-y-1/2 w-[200px] h-[200px] rotate-0 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute left-6 top-3/5 -translate-y-1/2 w-[250px] h-[250px] rotate-0 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: [-15, 15, -15] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -right-10 top-1/2 -translate-y-1/2 w-[200px] h-[200px] -rotate-4 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute -right-10 top-1/2 -translate-y-1/2 w-[250px] h-[250px] -rotate-4 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: [12, -12, 12] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-10 top-4/6 -translate-y-1/2 w-[200px] h-[200px] rotate-30 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute right-10 top-4/6 -translate-y-1/2 w-[250px] h-[250px] rotate-30 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
@@ -353,8 +357,8 @@ function LandingPage() {
         </motion.div>
 
         {/* Bottom Gradient */}
-        <div className="absolute inset-0 bottom-10 top-160 blur-[80px] bg-primary/40 h-16 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+        <div className="absolute inset-0 bottom-0 top-auto blur-[100px] bg-primary/50 h-32 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
       </section>
 
       {/* Features Section */}
@@ -646,36 +650,40 @@ function HomePage() {
           initial={{ y: 0 }}
           animate={{ y: [-10, 10, -10] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -left-10 top-1/3 w-[200px] h-[200px] rotate-20 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute -left-10 top-1/3 w-[250px] h-[250px] rotate-20 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: [10, -10, 10] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-6 top-2/3 w-[200px] h-[200px] rotate-0 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute left-6 top-2/3 w-[250px] h-[250px] rotate-0 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: [-15, 15, -15] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -right-10 top-1/2 -translate-y-1/2 w-[200px] h-[200px] -rotate-4 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute -right-10 top-1/2 -translate-y-1/2 w-[250px] h-[250px] -rotate-4 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: [12, -12, 12] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-10 top-2/3 w-[200px] h-[200px] rotate-30 z-0 hidden lg:block opacity-5 dark:opacity-10"
+          className="absolute right-10 top-2/3 w-[250px] h-[250px] rotate-30 z-0 hidden lg:block"
+          style={{ filter: 'brightness(0) saturate(100%) opacity(0.15)' }}
         >
-          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }} />
         </motion.div>
 
         <motion.div
@@ -884,8 +892,8 @@ function HomePage() {
         </motion.div>
 
         {/* Bottom Gradient */}
-        <div className="absolute inset-0 bottom-10 top-160 blur-[80px] bg-primary/40 h-16 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+        <div className="absolute inset-0 bottom-0 top-auto blur-[100px] bg-primary/50 h-32 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
       </section>
 
       {/* Quick Stats */}

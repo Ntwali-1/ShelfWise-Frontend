@@ -86,8 +86,66 @@ function LandingPage() {
       {/* Hero Section */}
       <section
         id="hero"
-        className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-20 bg-gradient-to-br from-background via-indigo-50/30 to-purple-50/20 dark:from-background dark:via-indigo-900/10 dark:to-purple-900/10"
+        className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-20 bg-white dark:bg-background overflow-hidden"
       >
+        {/* Grid Background */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.02]"
+            style={{
+              backgroundImage: `linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)`,
+              backgroundSize: '40px 40px',
+            }}
+          ></div>
+
+          <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_50%,hsl(var(--primary)/0.08),transparent)]"></div>
+
+          <div
+            className="absolute inset-0 opacity-[0.02] dark:opacity-[0.01]"
+            style={{
+              backgroundImage: `linear-gradient(to right, hsl(var(--primary)) 2px, transparent 2px), linear-gradient(to bottom, hsl(var(--primary)) 2px, transparent 2px)`,
+              backgroundSize: '200px 200px',
+            }}
+          ></div>
+        </div>
+
+        {/* Floating SVG Frames */}
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -left-10 top-2/5 -translate-y-1/3 w-[200px] h-[200px] rotate-20 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [10, -10, 10] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute left-6 top-3/5 -translate-y-1/2 w-[200px] h-[200px] rotate-0 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [-15, 15, -15] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -right-10 top-1/2 -translate-y-1/2 w-[200px] h-[200px] -rotate-4 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [12, -12, 12] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-10 top-4/6 -translate-y-1/2 w-[200px] h-[200px] rotate-30 z-0 hidden lg:block opacity-5 dark:opacity-10"
+        >
+          <img src="/Rectangle-Frame.png" alt="" className="w-full h-full object-contain" />
+        </motion.div>
+
         <motion.div
           className="container max-w-7xl mx-auto z-10"
           variants={containerVariants}

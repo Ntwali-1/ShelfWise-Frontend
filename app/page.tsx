@@ -162,13 +162,32 @@ function LandingPage() {
                 </span>
               </motion.div>
 
-              <motion.h1
-                className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight mb-6"
-                variants={itemVariants}
-              >
-                <span className="block mb-2">Shop Smarter,</span>
-                <span className="text-primary block text-glow">Live Better</span>
-              </motion.h1>
+              <div className="inline-block relative mb-8">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5, duration: 0.6 }}
+                  className="absolute -left-32 -top-8 hidden lg:block"
+                >
+                  <img src="/LeftArrow.png" width={60} height={60} alt="" />
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5, duration: 0.6 }}
+                  className="absolute -right-32 -top-8 hidden lg:block"
+                >
+                  <img src="/RightArrow.png" width={60} height={60} alt="" />
+                </motion.div>
+
+                <motion.h1
+                  className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight"
+                  variants={itemVariants}
+                >
+                  <span className="block mb-2">Shop Smarter,</span>
+                  <span className="text-primary block text-glow">Live Better</span>
+                </motion.h1>
+              </div>
 
               <motion.div
                 className="flex items-center justify-center lg:justify-start gap-3 mb-8 text-xl md:text-2xl font-semibold min-h-[40px]"

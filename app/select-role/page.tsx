@@ -66,11 +66,8 @@ export default function SelectRolePage() {
 
       await usersApi.selectRole(selectedRole, token);
       
-      if (selectedRole === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/products');
-      }
+      // Redirect to profile completion
+      router.push('/complete-profile');
     } catch (err: any) {
       console.error('Role selection error:', err);
       setError(err.message || 'Failed to select role');

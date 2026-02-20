@@ -102,68 +102,14 @@ export default function ProfilePage() {
         birthday: profile.birthday || undefined,
       }
 
-      // Check if profile exists (originalProfile not null and has ID? APIs usually handle create/update or upsert)
-      // profileApi.update maps to PUT /profile. 
-      // Backend `ProfileController.updateProfile` calls `service.updateProfile`.
-      // `service.updateProfile` uses `prisma.profile.update({ where: { userId } ... })`.
-      // This will FAIL if profile record doesn't exist.
-      // We need to know if we should CREATE or UPDATE.
-      // `ProfileController` has `POST /profile` for create.
-      // logic: if `originalProfile` (fetched from backend) was null/empty (meaning no profile record), use POST.
-      // But `fetchProfile` handled "data could be null".
-      // Let's check `ProfileService` again. `getProfile` returns null if not found.
-      // So if we didn't get data from `profileApi.get`, we should use `create` (POST).
-
-      // I'll make the API smart or handle it here. simple way: try update, if 404/error, try create?
-      // Or better: track if we have a profile.
-
-      // Let's use a flag `hasProfile`.
-      // But I can't easily add a flag to state without checking fetching logic again.
-      // I'll assume fetching logic: if `data` is null, `hasProfile = false`.
-
-      // Actually, let's just try POST if it's new. 
-      // API: `profileApi.create` maps to POST /profile.
-      // API: `profileApi.update` maps to PUT /profile.
-
-      // Determining if profile exists:
-      // In `fetchProfile`: `if (data)` -> exists.
-
-      let isNew = false
-      // We need to track this. I'll add a state `isNewProfile`.
-
-      // Wait, I can't reliably know from just `profile` state. 
-      // I'll try update. If it fails (likely 404 from Prisma update), then create.
-      // Or I can add `isNewProfile` state.
-
-      // Adding `isNewProfile` state.
-
-      // Code below implements this logic.
-
+      // Backend now uses upsert, so PUT will handle both create and update
       await profileApi.update(updateData, token)
-      toast.success('Profile updated')
+      toast.success('Profile saved successfully')
       setOriginalProfile(profile)
       setIsEditing(false)
     } catch (error: any) {
-      // If update failed, maybe it doesn't exist? Try create.
-      try {
-        const token = await getToken()
-        if (!token) return
-        const updateData = {
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-          phoneNumber: profile.phone,
-          address: profile.address,
-          bio: profile.bio,
-          birthday: profile.birthday || undefined,
-        }
-        await profileApi.create(updateData, token)
-        toast.success('Profile created')
-        setOriginalProfile(profile)
-        setIsEditing(false)
-      } catch (createError) {
-        console.error('Failed to save profile:', error)
-        toast.error('Failed to save changes')
-      }
+      console.error('Failed to save profile:', error)
+      toast.error('Failed to save changes')
     }
   }
 

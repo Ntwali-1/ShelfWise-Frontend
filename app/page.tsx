@@ -890,6 +890,13 @@ function EnhancedCategoryCard({ category, index }: { category: any; index: numbe
     Toys: 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=600&h=400&fit=crop',
     Beauty: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=400&fit=crop',
     Groceries: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=400&fit=crop',
+    Furniture: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=400&fit=crop',
+    Garden: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop',
+    Automotive: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&h=400&fit=crop',
+    Music: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=600&h=400&fit=crop',
+    Pet: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600&h=400&fit=crop',
+    Office: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop',
+    Kitchen: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop',
   }
 
   const image = categoryImages[category.name] || 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&h=400&fit=crop'
@@ -927,9 +934,10 @@ function EnhancedCategoryCard({ category, index }: { category: any; index: numbe
                 <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </h3>
               <p className="text-sm text-white/90 mb-3">{category.description || 'Explore amazing products'}</p>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium">
-                <Package className="h-4 w-4" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium group-hover:bg-white/30 transition-all duration-300">
+                <Package className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 <span>Browse Now</span>
+                <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
               </div>
             </motion.div>
           </div>
@@ -960,12 +968,16 @@ function FeatureBox({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay, duration: 0.5 }}
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -8, scale: 1.02 }}
     >
-      <div className="mb-4 inline-flex rounded-xl bg-primary/10 p-4 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 group-hover:scale-110">
+      <motion.div
+        className="mb-4 inline-flex rounded-xl bg-primary/10 p-4 text-primary transition-all duration-300"
+        whileHover={{ scale: 1.15, rotate: 5 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+      >
         {icon}
-      </div>
-      <h3 className="mb-2 text-xl font-bold">{title}</h3>
+      </motion.div>
+      <h3 className="mb-2 text-xl font-bold group-hover:text-primary transition-colors">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
     </motion.div>
   )

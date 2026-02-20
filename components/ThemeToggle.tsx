@@ -16,14 +16,14 @@ export default function ThemeToggle() {
   // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
     return (
-      <div className="h-10 w-10 rounded-full bg-primary/10 p-2" />
+      <div className="h-11 w-11 rounded-full bg-primary/10 p-2.5" />
     )
   }
 
   return (
     <motion.button
       onClick={toggleTheme}
-      className="relative h-10 w-10 rounded-full bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
+      className="relative h-11 w-11 rounded-full bg-primary/10 p-2.5 text-primary transition-colors hover:bg-primary/20 flex items-center justify-center"
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       aria-label="Toggle theme"
@@ -32,11 +32,12 @@ export default function ThemeToggle() {
         initial={false}
         animate={{ rotate: theme === 'dark' ? 180 : 0 }}
         transition={{ duration: 0.3 }}
+        className="flex items-center justify-center"
       >
         {theme === 'light' ? (
-          <Moon className="h-full w-full" />
+          <Moon className="h-5 w-5" />
         ) : (
-          <Sun className="h-full w-full" />
+          <Sun className="h-5 w-5" />
         )}
       </motion.div>
     </motion.button>

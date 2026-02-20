@@ -1,11 +1,11 @@
 'use client'
 
-import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { ShoppingCart, Heart, Search, Menu, Package } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import ThemeToggle from './ThemeToggle'
+import UserMenu from './UserMenu'
 import ClientOnly from './ClientOnly'
 
 export default function Navbar() {
@@ -81,7 +81,9 @@ export default function Navbar() {
                 0
               </span>
             </Link>
-            <UserButton afterSignOutUrl="/" />
+            <ClientOnly>
+              <UserMenu />
+            </ClientOnly>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="rounded-lg p-2 transition-colors hover:bg-accent md:hidden"

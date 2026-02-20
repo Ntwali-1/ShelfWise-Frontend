@@ -38,7 +38,18 @@ async function apiRequest<T>(
       throw new Error(error.message || `HTTP error! status: ${response.status}`)
     }
 
-    return await response.json()
+    // Handle empty responses (204 No Content, etc.)
+    const contentType = response.headers.get('content-type')
+    if (!contentType || !contentType.includes('application/json')) {
+      return {} as T
+    }
+
+    const text = await response.text()
+    if (!text) {
+      return {} as T
+    }
+
+    return JSON.parse(text) as T
   } catch (error) {
     console.error('API request failed:', error)
     throw error

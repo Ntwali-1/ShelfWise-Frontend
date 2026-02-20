@@ -15,6 +15,7 @@ export default function RoleCheck({ children }: { children: React.ReactNode }) {
 
   // Public routes that don't need role check
   const isSelectRolePage = pathname === '/select-role';
+  const isCompleteProfilePage = pathname === '/complete-profile';
 
   useEffect(() => {
     const checkUserRole = async () => {
@@ -25,8 +26,8 @@ export default function RoleCheck({ children }: { children: React.ReactNode }) {
 
       // If not signed in or on public route, allow through
       // If not signed in, allow through. Middleware handles protected routes.
-      // If on select-role, stop checking to avoid loops.
-      if (!isSignedIn || isSelectRolePage) {
+      // If on select-role or complete-profile, stop checking to avoid loops.
+      if (!isSignedIn || isSelectRolePage || isCompleteProfilePage) {
         setChecking(false);
         return;
       }
@@ -45,7 +46,22 @@ export default function RoleCheck({ children }: { children: React.ReactNode }) {
           // User doesn't have role, redirect to select-role
           router.push('/select-role');
         } else {
-          setChecking(false);
+          // Check if profile is complete
+          try {
+            const profileData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
+              headers: { Authorization: `Bearer ${token}` }
+            }).then(res => res.json());
+
+            if (!profileData || !profileData.firstName) {
+              // Profile not complete, redirect to complete-profile
+              router.push('/complete-profile');
+            } else {
+              setChecking(false);
+            }
+          } catch (profileError) {
+            // Profile doesn't exist, redirect to complete-profile
+            router.push('/complete-profile');
+          }
         }
       } catch (error: any) {
         console.error('Error checking user role:', error);
@@ -64,7 +80,7 @@ export default function RoleCheck({ children }: { children: React.ReactNode }) {
 
   // Show loading state while checking
   // If we are checking, we want to block rendering even on public routes to avoid flash of content before redirect
-  if (checking && !isSelectRolePage && isSignedIn) {
+  if (checking && !isSelectRolePage && !isCompleteProfilePage && isSignedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

@@ -42,4 +42,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-config.bat
+
+# Local environment files; keep sanitized examples trackable
+.env
+.env.*
+!.env.example
